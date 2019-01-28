@@ -15,6 +15,7 @@ import smtplib
 from email.mime.text import MIMEText
 from itertools import chain
 import six
+import importlib
 
 from .ldap_lookup import LdapLookup
 from c7n_mailer.utils_email import is_email
@@ -202,6 +203,11 @@ class EmailDelivery(object):
         event_owner_email = self.get_event_owner_email(targets, sqs_message['event'])
 
         account_emails = self.get_account_emails(sqs_message)
+
+        # check config for custom_email_lookup module
+        custom_module = self.config.get('custom_email_lookup', None) # TODO: Split on semicolon package from module and function
+        if custom_module:
+            cust_mod = importlib.import_module(custom_module) 
 
         policy_to_emails = policy_to_emails + event_owner_email + account_emails
         for resource in sqs_message['resources']:
