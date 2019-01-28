@@ -20,6 +20,7 @@ CONFIG_SCHEMA = {
     'properties': {
         'queue_url': {'type': 'string'},
         'from_address': {'type': 'string'},
+        'custom_email_lookup': {'type': 'string'},
         'contact_tags': {'type': 'array', 'items': {'type': 'string'}},
         'org_domain': {'type': 'string'},
 
