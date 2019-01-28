@@ -296,6 +296,8 @@ class LambdaManager(object):
                     e, func.alias)
         return result
 
+    add = publish
+
     def remove(self, func, alias=None):
         for e in func.get_events(self.session_factory):
             e.remove(func)
@@ -418,6 +420,7 @@ class LambdaManager(object):
             # after configuration change?
 
             new_config = func.get_config()
+            new_config['Role'] = role
             new_tags = new_config.pop('Tags', {})
 
             config_changed = self.delta_function(old_config, new_config)
@@ -436,11 +439,11 @@ class LambdaManager(object):
             tags_to_add, tags_to_remove = self.diff_tags(old_tags, new_tags)
 
             if tags_to_add:
-                log.debug("Adding/updating tags: %s config" % func.name)
+                log.debug("Updating function tags: %s" % func.name)
                 self.client.tag_resource(
                     Resource=base_arn, Tags=tags_to_add)
             if tags_to_remove:
-                log.debug("Removing tags: %s config" % func.name)
+                log.debug("Removing function stale tags: %s" % func.name)
                 self.client.untag_resource(
                     Resource=base_arn, TagKeys=tags_to_remove)
 
@@ -734,7 +737,7 @@ class PolicyLambda(AbstractLambdaFunction):
 
     @property
     def runtime(self):
-        return self.policy.data['mode'].get('runtime', 'python2.7')
+        return self.policy.data['mode'].get('runtime', 'python3.7')
 
     @property
     def memory_size(self):
@@ -858,9 +861,21 @@ class CloudWatchEventSource(object):
 
     def __init__(self, data, session_factory):
         self.session_factory = session_factory
-        self.session = session_factory()
-        self.client = self.session.client('events')
+        self._session = None
+        self._client = None
         self.data = data
+
+    @property
+    def session(self):
+        if not self._session:
+            self._session = self.session_factory()
+        return self._session
+
+    @property
+    def client(self):
+        if not self._client:
+            self._client = self.session.client('events')
+        return self._client
 
     def get(self, rule_name):
         return resource_exists(self.client.describe_rule, Name=rule_name)

@@ -1,9 +1,23 @@
+# Copyright 2017-2018 Capital One Services, LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import json
 
 from mock import Mock
 
 from c7n.config import Bag
+from c7n.exceptions import PolicyValidationError
 from c7n.resources import aws
 from c7n import output
 
@@ -34,6 +48,20 @@ class UtilTest(BaseTest):
         config = Bag(assume_role='arn:aws:iam::644160558196:role/custodian-mu')
         aws._default_account_id(config)
         self.assertEqual(config.account_id, '644160558196')
+
+    def test_validate(self):
+        self.assertRaises(
+            PolicyValidationError,
+            aws.shape_validate,
+            {'X': 1},
+            'AwsSecurityFindingFilters',
+            'securityhub')
+        self.assertEqual(
+            aws.shape_validate(
+                {'Id': [{'Value': 'abc', 'Comparison': 'EQUALS'}]},
+                'AwsSecurityFindingFilters',
+                'securityhub'),
+            None)
 
 
 class TracerTest(BaseTest):

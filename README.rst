@@ -2,8 +2,8 @@
      :target: https://gitter.im/capitalone/cloud-custodian?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
      :alt: Join the chat at https://gitter.im/capitalone/cloud-custodian
 
-.. image:: https://ci.cloudcustodian.io/api/badges/capitalone/cloud-custodian/status.svg
-     :target: https://ci.cloudcustodian.io/capitalone/cloud-custodian
+.. image:: https://dev.azure.com/cloud-custodian/cloud-custodian/_apis/build/status/cloud-custodian.cloud-custodian?branchName=master
+     :target: https://dev.azure.com/cloud-custodian/cloud-custodian/_build
      :alt: Build Status
 
 .. image:: https://img.shields.io/badge/license-Apache%202-blue.svg
@@ -22,11 +22,12 @@
 Cloud Custodian
 ---------------
 
-Cloud Custodian is a rules engine for managing public cloud fleets. It
-allows users to define policies to enable a well managed cloud infrastructure,
-that's both secure and cost optimized. It consolidates many of the adhoc
-scripts organizations have into a lightweight and flexible tool, with unified
-metrics and reporting.
+Cloud Custodian is a rules engine for managing public cloud accounts
+and resources. It allows users to define policies to enable a well
+managed cloud infrastructure, that's both secure and cost
+optimized. It consolidates many of the adhoc scripts organizations
+have into a lightweight and flexible tool, with unified metrics and
+reporting.
 
 Custodian can be used to manage AWS, Azure, and GCP environments by
 ensuring real time compliance to security policies (like encryption
@@ -49,24 +50,26 @@ execute against large existing fleets.
 Features
 ########
 
-- Comprehensive support for AWS services and resources with a rich library of actions and filters to build policies with.
+- Comprehensive support for public cloud services and resources with a
+  rich library of actions and filters to build policies with.
 - Supports arbitrary filtering on resources with nested boolean conditions.
 - Dry run any policy to see what it would do.
 - Automatically provisions serverless functions and event sources (
-    AWS CloudWatchEvents, AWS Config Rules, Azure EventGrid, GCP AuditLog & Pub/Sub, etc)
+  AWS CloudWatchEvents, AWS Config Rules, Azure EventGrid, GCP AuditLog & Pub/Sub, etc)
 - Cloud provider native metrics outputs on resources that matched a policy
 - Structured outputs into cloud native object storage of which resources matched a policy.
 - Intelligent cache usage to minimize api calls.
-- Battle-tested - in production on some very large cloud environments.
 - Supports multi-account/subscription/project usage.
+- Battle-tested - in production on some very large cloud environments.
+
 
 Links
 #####
 
-- `Homepage <https://developer.capitalone.com/opensource-projects/cloud-custodian>`_
-- `Docs <http://capitalone.github.io/cloud-custodian/docs/>`_
-- `Developer Install <http://capitalone.github.io/cloud-custodian/docs/developer/installing.html>`_
-
+- `Homepage <http://cloudcustodian.io>`_
+- `Docs <http://cloudcustodian.io/docs/index.html>`_
+- `Developer Install <https://cloudcustodian.io/docs/developer/installing.html>`_
+- `Presentations <https://www.google.com/search?q=cloud+custodian&source=lnms&tbm=vid>`_
 
 Quick Install
 #############
@@ -93,7 +96,7 @@ First a policy file needs to be created in YAML format, as an example::
       - encrypt-keys
 
   - name: ec2-require-non-public-and-encrypted-volumes
-    resource: ec2
+    resource: aws.ec2
     description: |
       Provision a lambda and cloud watch event target
       that looks at all new instances and terminates those with
@@ -103,14 +106,14 @@ First a policy file needs to be created in YAML format, as an example::
       events:
           - RunInstances
     filters:
-      - type: aws.ebs
+      - type: ebs
         key: Encrypted
         value: false
     actions:
       - terminate
 
   - name: tag-compliance
-    resource: ec2
+    resource: aws.ec2
     description: |
       Schedule a resource that does not meet tag compliance policies
       to be stopped in four days.
@@ -160,6 +163,12 @@ The Custodian project also develops and maintains a suite of additional tools
 here https://github.com/capitalone/cloud-custodian/tree/master/tools:
 
 
+Org
+   Multi-account policy execution.
+
+PolicyStream
+   Git history as stream of logical policy changes.
+
 Salactus
    Scale out s3 scanning.
 
@@ -167,7 +176,7 @@ Mailer
    A reference implementation of sending messages to users to notify them.
 
 TrailDB
-   Cloudtrail indexing and timeseries generation for dashboarding
+   Cloudtrail indexing and timeseries generation for dashboarding.
 
 LogExporter
    Cloud watch log exporting to s3
@@ -176,7 +185,7 @@ Index
    Indexing of custodian metrics and outputs for dashboarding
 
 Sentry
-   Log parsing for python tracebacks to integrate with
+   Cloudwatch Log parsing for python tracebacks to integrate with
    https://sentry.io/welcome/
 
 
