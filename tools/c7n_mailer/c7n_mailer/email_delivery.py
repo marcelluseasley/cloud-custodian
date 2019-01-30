@@ -207,10 +207,11 @@ class EmailDelivery(object):
         # check config for custom_email_lookup module
         custom_module = self.config.get('custom_email_lookup', None) # TODO: Split on semicolon package from module and function
         
-        package_name, module_name = custom_module.rsplit(':',1)
-        module_obj = importlib.import_module(package_name)
-        method_to_call = getattr(module_obj, module_name)
-        custom_module_emails = method_to_call(sqs_message)
+        if custom_module:
+            package_name, module_name = custom_module.rsplit(':',1)
+            module_obj = importlib.import_module(package_name)
+            method_to_call = getattr(module_obj, module_name)
+            custom_module_emails = method_to_call(sqs_message)
 
 
         policy_to_emails = policy_to_emails + event_owner_email + account_emails + custom_module_emails
