@@ -206,10 +206,14 @@ class EmailDelivery(object):
 
         # check config for custom_email_lookup module
         custom_module = self.config.get('custom_email_lookup', None) # TODO: Split on semicolon package from module and function
-        if custom_module:
-            cust_mod = importlib.import_module(custom_module) 
+        
+        package_name, module_name = custom_module.rsplit(':',1)
+        module_obj = importlib.import_module(package_name)
+        method_to_call = getattr(module_obj, module_name)
+        custom_module_emails = method_to_call(sqs_message)
 
-        policy_to_emails = policy_to_emails + event_owner_email + account_emails
+
+        policy_to_emails = policy_to_emails + event_owner_email + account_emails + custom_module_emails
         for resource in sqs_message['resources']:
             # this is the list of emails that will be sent for this resource
             resource_emails = []
