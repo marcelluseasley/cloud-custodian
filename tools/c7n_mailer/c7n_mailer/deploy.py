@@ -49,6 +49,13 @@ def get_archive(config):
         # requests (recursive deps), needed by datadog and slackclient
         'requests', 'urllib3', 'idna', 'chardet', 'certifi')
 
+        # logic to add custom module to Python Package archive
+    custom_module = config.get('custom_email_lookup', None)
+    package_name, module_name = custom_module.rsplit(':',1)
+
+    if custom_module:
+        archive.add_modules(None, package_name)
+
     for d in set(config['templates_folders']):
         if not os.path.exists(d):
             continue
