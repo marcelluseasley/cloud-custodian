@@ -51,7 +51,7 @@ def get_archive(config):
 
         # logic to add custom module to Python Package archive
     custom_module = config.get('custom_email_lookup', None)
-    package_name, module_name = custom_module.rsplit(':',1)
+    package_name = custom_module.rsplit(':',1)[0]
 
     if custom_module:
         archive.add_modules(None, package_name)
