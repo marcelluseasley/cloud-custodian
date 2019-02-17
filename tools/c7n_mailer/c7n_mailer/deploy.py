@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import copy
 import json
 import os
+import sys # TODO: remove me
 
 from c7n.mu import (
     CloudWatchEventSource,
@@ -50,8 +51,16 @@ def get_archive(config):
         'requests', 'urllib3', 'idna', 'chardet', 'certifi')
 
         # logic to add custom module to Python Package archive
-    custom_module = config.get('custom_email_lookup', None)
-    package_name = custom_module.rsplit(':',1)[0]
+    print(sys.path)  # TODO: remove me                                            
+    print(config)                                                     
+    acct_name = config.get('account_name', None) 
+    if acct_name:                         
+        print("Account Name:", acct_name)                  
+    custom_module = config.get('custom_email_lookup', None)         
+    if custom_module:                                                
+        print("Custom Module value:",custom_module) 
+        custom_module = config.get('custom_email_lookup', None)
+        package_name = custom_module.rsplit(':',1)[0]
 
     if custom_module:
         archive.add_modules(None, package_name)
