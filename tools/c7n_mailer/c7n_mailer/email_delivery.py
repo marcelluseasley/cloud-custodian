@@ -208,13 +208,11 @@ class EmailDelivery(object):
         # check config for custom_email_lookup module
         custom_module = self.config.get('custom_email_lookup', None) # TODO: Split on semicolon package from module and function
         
-        if custom_module:
-            self.logger.info("CUSTOM MODULE: " + custom_module) #TODO: remove
-            package_name, module_name = custom_module.rsplit(':',1)
-            self.logger.info("PACKAGENAME: " + package_name)
-            self.logger.info("MODULENAME: " + module_name)
-            module_obj = importlib.import_module(package_name)
-            method_to_call = getattr(module_obj, module_name)
+        if custom_module:            
+            package, module_and_function = custom_module.rsplit(':',1)
+            module, function = module_and_function.rsplit('.',1)
+            m = importlib.import_module('.' + module, package)
+            method_to_call = getattr(m,function)
             custom_module_emails = method_to_call(sqs_message)
 
 
