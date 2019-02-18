@@ -16,6 +16,7 @@ from email.mime.text import MIMEText
 from itertools import chain
 import six
 import importlib
+import sys #TODO: remove me
 
 from .ldap_lookup import LdapLookup
 from c7n_mailer.utils_email import is_email
@@ -208,7 +209,10 @@ class EmailDelivery(object):
         custom_module = self.config.get('custom_email_lookup', None) # TODO: Split on semicolon package from module and function
         
         if custom_module:
+            self.logger.info("CUSTOM MODULE: " + custom_module) #TODO: remove
             package_name, module_name = custom_module.rsplit(':',1)
+            self.logger.info("PACKAGENAME: " + package_name)
+            self.logger.info("MODULENAME: " + module_name)
             module_obj = importlib.import_module(package_name)
             method_to_call = getattr(module_obj, module_name)
             custom_module_emails = method_to_call(sqs_message)
